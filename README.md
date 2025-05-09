@@ -130,19 +130,3 @@ npm run build
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Team
-
-- Sarah Johnson - Founder & CEO
-- Michael Chen - Head of Sourcing
-- Aisha Patel - Sustainability Director
-
-## 📞 Support
-
-For support, email support@organicgrocer.com or join our Slack channel.
-
-## 🙏 Acknowledgments
-
-- All our partner farmers
-- The open-source community
-- Our amazing customers
