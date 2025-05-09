@@ -72,6 +72,192 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          date: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          replied: boolean
+          status: string
+          subject: string
+        }
+        Insert: {
+          date?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          replied?: boolean
+          status?: string
+          subject: string
+        }
+        Update: {
+          date?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          replied?: boolean
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      customer_segments: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          criteria: Json | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          criteria?: Json | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          criteria?: Json | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      email_campaigns: {
+        Row: {
+          click_rate: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          open_rate: number | null
+          recipient_count: number | null
+          recipients: string | null
+          sent_date: string | null
+          status: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          click_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          open_rate?: number | null
+          recipient_count?: number | null
+          recipients?: string | null
+          sent_date?: string | null
+          status?: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          click_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          open_rate?: number | null
+          recipient_count?: number | null
+          recipients?: string | null
+          sent_date?: string | null
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_id: string | null
+          price: number
+          product_id: string | null
+          quantity: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          price: number
+          product_id?: string | null
+          quantity?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          price?: number
+          product_id?: string | null
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          customer_email: string
+          customer_name: string
+          id: string
+          order_id: string
+          status: string
+          total: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_email: string
+          customer_name: string
+          id?: string
+          order_id: string
+          status?: string
+          total: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          order_id?: string
+          status?: string
+          total?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -156,6 +342,27 @@ export type Database = {
           state?: string | null
           updated_at?: string | null
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
         }
         Relationships: []
       }

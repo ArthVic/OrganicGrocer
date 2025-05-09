@@ -43,7 +43,7 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:8080](http://localhost:8080) in your browser.
+4. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## 🛠️ Built With
 
@@ -131,3 +131,18 @@ npm run build
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 👥 Team
+
+- Sarah Johnson - Founder & CEO
+- Michael Chen - Head of Sourcing
+- Aisha Patel - Sustainability Director
+
+## 📞 Support
+
+For support, email support@organicgrocer.com or join our Slack channel.
+
+## 🙏 Acknowledgments
+
+- All our partner farmers
+- The open-source community
+- Our amazing customers

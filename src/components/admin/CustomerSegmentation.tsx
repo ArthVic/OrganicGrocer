@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Card, CardContent, CardHeader, CardTitle
@@ -291,13 +292,15 @@ const CustomerSegmentation: React.FC = () => {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold">Customers in Segment</h3>
                     <div className="flex items-center space-x-2">
-                      <Input
-                        placeholder="Search customers..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-64"
-                        icon={<Search className="h-4 w-4" />}
-                      />
+                      <div className="relative w-64">
+                        <Search className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          placeholder="Search customers..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-8"
+                        />
+                      </div>
                       <Button variant="outline" onClick={handleSelectAll}>
                         {selectedCustomers.length === filteredCustomers.length ? 'Deselect All' : 'Select All'}
                       </Button>

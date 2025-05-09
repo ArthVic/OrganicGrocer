@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, Mail, Eye, MessageCircle, Check, X } from 'lucide-react';
+import { Search, Mail, Eye, MessageCircle, Check, X, RefreshCw } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -19,81 +19,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// Define MessageStatus type
-type MessageStatus = 'read' | 'unread';
-
-interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  date: string;
-  status: MessageStatus;
-  replied: boolean;
-}
-
-// Mock data for contact messages
-const mockMessages: ContactMessage[] = [
-  {
-    id: 'msg-1234',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    subject: 'Question about organic certification',
-    message: "I'm interested in learning more about your organic certification process. Can you provide more information about how you verify products are truly organic?",
-    date: '2023-05-07T14:30:00Z',
-    status: 'unread',
-    replied: false
-  },
-  {
-    id: 'msg-1235',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    subject: 'Damaged product in my order',
-    message: "I recently received my order #ORD-1235, and unfortunately one of the items was damaged during shipping. The glass jar of honey was cracked. Could I get a replacement?",
-    date: '2023-05-06T10:15:00Z',
-    status: 'read',
-    replied: false
-  },
-  {
-    id: 'msg-1236',
-    name: 'Alice Johnson',
-    email: 'alice.johnson@example.com',
-    subject: 'Bulk order inquiry',
-    message: "I'm planning an event and would like to place a bulk order of your organic fruit baskets. Do you offer any discounts for large orders? I would need about 50 baskets.",
-    date: '2023-05-05T16:45:00Z',
-    status: 'read',
-    replied: true
-  },
-  {
-    id: 'msg-1237',
-    name: 'Robert Wilson',
-    email: 'robert.wilson@example.com',
-    subject: 'Newsletter subscription issue',
-    message: "I've tried subscribing to your newsletter multiple times, but I'm not receiving any confirmation emails. Can you check if there's an issue with my subscription?",
-    date: '2023-05-04T09:20:00Z',
-    status: 'unread',
-    replied: false
-  },
-  {
-    id: 'msg-1238',
-    name: 'Emily Davis',
-    email: 'emily.davis@example.com',
-    subject: 'Product suggestion',
-    message: "I love your store and products! I was wondering if you've considered adding organic pet food to your inventory? I think it would be a great addition to your product line.",
-    date: '2023-05-03T11:10:00Z',
-    status: 'read',
-    replied: true
-  }
-];
+import { useContactMessages, ContactMessage, MessageStatus } from '@/hooks/useContactMessages';
 
 const ContactResponses: React.FC = () => {
-  const [messages, setMessages] = useState<ContactMessage[]>(mockMessages);
+  const { 
+    messages, 
+    loading, 
+    error, 
+    markAsRead, 
+    sendReply, 
+    formatDate, 
+    refreshMessages 
+  } = useContactMessages();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Filter messages based on search term and status
   const filteredMessages = messages.filter(message => {
@@ -110,24 +53,6 @@ const ContactResponses: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
   
-  // Mark message as read
-  const markAsRead = (id: string) => {
-    const updatedMessages = messages.map(message => {
-      if (message.id === id) {
-        return { ...message, status: 'read' as MessageStatus };
-      }
-      return message;
-    });
-    setMessages(updatedMessages);
-    
-    if (selectedMessage && selectedMessage.id === id) {
-      setSelectedMessage({
-        ...selectedMessage,
-        status: 'read'
-      });
-    }
-  };
-  
   // View message details
   const viewMessageDetails = (message: ContactMessage) => {
     setSelectedMessage(message);
@@ -140,37 +65,47 @@ const ContactResponses: React.FC = () => {
   };
   
   // Handle sending a reply
-  const handleSendReply = () => {
+  const handleSendReply = async () => {
     if (!selectedMessage || !replyText.trim()) return;
     
-    const updatedMessages = messages.map(message => {
-      if (message.id === selectedMessage.id) {
-        return { ...message, replied: true };
-      }
-      return message;
-    });
+    setIsSubmitting(true);
+    const success = await sendReply(selectedMessage.id, replyText);
     
-    setMessages(updatedMessages);
-    setSelectedMessage({
-      ...selectedMessage,
-      replied: true
-    });
+    if (success) {
+      // Update the selected message in state
+      setSelectedMessage({
+        ...selectedMessage,
+        replied: true,
+        status: 'read'
+      });
+      setReplyText('');
+    }
     
-    // In a real app, you would send the email here
-    alert(`Reply sent to ${selectedMessage.email}`);
-    setReplyText('');
+    setIsSubmitting(false);
   };
   
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+  // Refresh messages
+  const handleRefresh = () => {
+    refreshMessages();
   };
   
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight font-heading">Contact Form Responses</h2>
-        <p className="text-muted-foreground">Manage and respond to customer inquiries</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight font-heading">Contact Form Responses</h2>
+          <p className="text-muted-foreground">Manage and respond to customer inquiries</p>
+        </div>
+        <Button 
+          onClick={handleRefresh} 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1"
+          disabled={loading}
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
       
       <div className="flex flex-col md:flex-row gap-4">
@@ -204,7 +139,7 @@ const ContactResponses: React.FC = () => {
           <div className="border rounded-md overflow-hidden">
             <Table>
               <TableCaption>
-                {`${filteredMessages.length} messages`}
+                {loading ? 'Loading messages...' : `${filteredMessages.length} messages`}
               </TableCaption>
               <TableHeader>
                 <TableRow>
@@ -216,7 +151,13 @@ const ContactResponses: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredMessages.length === 0 ? (
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-leaf-600 mx-auto"></div>
+                    </TableCell>
+                  </TableRow>
+                ) : filteredMessages.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10">
                       No messages found
@@ -246,7 +187,7 @@ const ContactResponses: React.FC = () => {
                         {message.subject}
                       </TableCell>
                       <TableCell>
-                        {new Date(message.date).toLocaleDateString()}
+                        {formatDate(message.date)}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button 
@@ -301,17 +242,30 @@ const ContactResponses: React.FC = () => {
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     className="min-h-[150px] mb-4"
+                    disabled={isSubmitting || selectedMessage.replied}
                   />
                   <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => setReplyText('')}>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setReplyText('')}
+                      disabled={isSubmitting || selectedMessage.replied}
+                    >
                       <X className="h-4 w-4 mr-2" /> Clear
                     </Button>
                     <Button 
                       onClick={handleSendReply} 
-                      disabled={!replyText.trim()}
+                      disabled={!replyText.trim() || isSubmitting || selectedMessage.replied}
                       className="bg-leaf-600 hover:bg-leaf-700"
                     >
-                      <Mail className="h-4 w-4 mr-2" /> Send Reply
+                      {isSubmitting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white mr-2"></div> Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="h-4 w-4 mr-2" /> Send Reply
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -333,6 +287,14 @@ const ContactResponses: React.FC = () => {
           )}
         </div>
       </div>
+      
+      {error && (
+        <Card className="bg-red-50">
+          <CardContent className="p-4">
+            <p className="text-red-600">Error: {error}</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

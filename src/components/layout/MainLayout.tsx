@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+
+import React, { ReactNode, useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +18,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   requireAdmin = false 
 }) => {
   const { user, loading } = useAuth();
+
+  // Check if user has admin role
+  const isAdmin = user?.role === 'admin' || user?.app_metadata?.role === 'admin';
 
   // Show loading indicator
   if (loading) {
@@ -37,10 +41,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     return <Navigate to="/auth" />;
   }
 
-  // If admin access is required, check if user is logged in
-  if (requireAdmin && !user) {
-    toast.error("You must be logged in to access the admin panel");
-    return <Navigate to="/auth" />;
+  // If admin access is required and user is not admin
+  if (requireAdmin) {
+    if (!user) {
+      toast.error("You must be logged in to access the admin panel");
+      return <Navigate to="/auth" />;
+    }
+    
+    if (!isAdmin) {
+      toast.error("You don't have permission to access the admin panel");
+      return <Navigate to="/" />;
+    }
   }
 
   return (
